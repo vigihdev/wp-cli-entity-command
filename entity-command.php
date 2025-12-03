@@ -1,6 +1,7 @@
 <?php
 
-use Vigihdev\WpCliEntityCommand\Category\List_Category_Command;
+use Vigihdev\WpCliEntityCommand\Category\{List_Category_Command};
+use Vigihdev\WpCliEntityCommand\Taxonomy\{List_Taxonomy_Command};
 
 if (! class_exists('WP_CLI')) {
     return;
@@ -13,3 +14,6 @@ if (file_exists($autoloader)) {
 
 // Block Category
 WP_CLI::add_command('category:list', new List_Category_Command());
+
+// Block Taxonomy Command
+WP_CLI::add_command('taxonomy:list', new List_Taxonomy_Command());
