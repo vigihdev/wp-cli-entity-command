@@ -15,7 +15,7 @@ if (file_exists($autoloader)) {
 
 $configs = [
     'Vigihdev\WpCliEntityCommand\Menu' => [
-        'menu:list' => 'List_Menu_Commands',
+        'menu:list' => 'List_Menu_Command',
     ],
     'Vigihdev\WpCliEntityCommand\Category' => [
         'category:list' => 'List_Category_Command',
