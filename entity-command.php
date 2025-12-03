@@ -1,9 +1,5 @@
 <?php
 
-use Vigihdev\WpCliEntityCommand\Category\{List_Category_Command};
-use Vigihdev\WpCliEntityCommand\Taxonomy\{List_Taxonomy_Command};
-use Vigihdev\WpCliEntityCommand\Menu\{List_Menu_Command};
-
 if (! class_exists('WP_CLI')) {
     return;
 }
