@@ -10,6 +10,7 @@ use WP_CLI\Formatter;
 
 final class List_Taxonomy_Command extends WP_CLI_Command
 {
+
     /**
      * Lists all registered taxonomies in WordPress.
      *
