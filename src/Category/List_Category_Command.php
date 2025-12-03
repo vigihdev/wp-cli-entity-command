@@ -12,7 +12,7 @@ use WP_CLI_Command;
  * 
  * Usage: wp category:list
  */
-class CategoryListCommand extends WP_CLI_Command
+class List_Category_Command extends WP_CLI_Command
 {
     /**
      * List all categories
