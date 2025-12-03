@@ -55,6 +55,6 @@
         ]
     },
     "scripts": {
-        "server": "php -S localhost:2172 server.php"
+        "dev": "php -S localhost:2172 dev.php"
     }
 }

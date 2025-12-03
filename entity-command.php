@@ -2,6 +2,7 @@
 
 use Vigihdev\WpCliEntityCommand\Category\{List_Category_Command};
 use Vigihdev\WpCliEntityCommand\Taxonomy\{List_Taxonomy_Command};
+use Vigihdev\WpCliEntityCommand\Menu\{List_Menu_Command};
 
 if (! class_exists('WP_CLI')) {
     return;
@@ -12,8 +13,24 @@ if (file_exists($autoloader)) {
     require_once $autoloader;
 }
 
-// Block Category
-WP_CLI::add_command('category:list', new List_Category_Command());
+$configs = [
+    'Vigihdev\WpCliEntityCommand\Menu' => [
+        'menu:list' => 'List_Menu_Command',
+    ],
+    'Vigihdev\WpCliEntityCommand\Category' => [
+        'category:list' => 'List_Category_Command',
+    ],
+    'Vigihdev\WpCliEntityCommand\Taxonomy' => [
+        'taxonomy:list' => 'List_Taxonomy_Command'
+    ],
+];
 
-// Block Taxonomy Command
-WP_CLI::add_command('taxonomy:list', new List_Taxonomy_Command());
+foreach ($configs as $namespace => $commands) {
+    foreach ($commands as $command => $className) {
+        $class = "{$namespace}\\{$className}";
+        if (!class_exists($class)) {
+            throw new RuntimeException("{$class} tidak tersedia");
+        }
+        WP_CLI::add_command($command, new $class());
+    }
+}
