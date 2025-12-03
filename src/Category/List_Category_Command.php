@@ -12,15 +12,8 @@ final class List_Category_Command extends WP_CLI_Command
 {
 
     /**
-     * 
-     * Make Pwa Command
-     * 
      * ## OPTIONS
      *
-     * [--force]
-     * : Make Pwa Command
-     *
-     * ---
      * @param string[] $args Positional arguments. Unused.
      * @param array<string,string>
      */
