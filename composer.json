@@ -1,0 +1,64 @@
+{
+    "name": "vigihdev/wp-cli-entity-command",
+    "description": "A WP-CLI command for managing various WordPress entities (posts, pages, custom post types, taxonomies, terms, users, comments) efficiently via the command line.",
+    "keywords": [
+        "wp-cli",
+        "wordpress-cli",
+        "entity",
+        "custom-post-type",
+        "cpt",
+        "taxonomy",
+        "post-management",
+        "wordpress-development",
+        "command-line",
+        "developer-tools",
+        "content-management",
+        "post-type",
+        "term-management",
+        "efficiency-tools"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "authors": [
+        {
+            "name": "Vigih Dev",
+            "email": "vigihdev@gmail.com",
+            "role": "developer"
+        }
+    ],
+    "require": {
+        "php": "^8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vigihdev\\WpCliEntityCommand\\": "src/"
+        },
+        "files": [
+            "entity-command.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Vigihdev\\WpCliEntityCommand\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "process-timeout": 0
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "2.x-dev"
+        },
+        "bundled": true,
+        "commands": [
+            "post:list",
+            "category:list",
+            "menu:list"
+        ]
+    },
+    "scripts": {
+        "server": "php -S localhost:2172 server.php"
+    }
+}
