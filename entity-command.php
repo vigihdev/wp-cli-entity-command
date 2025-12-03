@@ -22,6 +22,9 @@ $configs = [
     'Vigihdev\WpCliEntityCommand\Post' => [
         'post:list' => 'List_Post_Command'
     ],
+    'Vigihdev\WpCliEntityCommand\Term' => [
+        'term:list' => 'List_Term_Command'
+    ],
 ];
 
 foreach ($configs as $namespace => $commands) {
