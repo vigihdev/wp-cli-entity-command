@@ -19,6 +19,9 @@ $configs = [
     'Vigihdev\WpCliEntityCommand\Taxonomy' => [
         'taxonomy:list' => 'List_Taxonomy_Command'
     ],
+    'Vigihdev\WpCliEntityCommand\Post' => [
+        'post:list' => 'List_Post_Command'
+    ],
 ];
 
 foreach ($configs as $namespace => $commands) {
