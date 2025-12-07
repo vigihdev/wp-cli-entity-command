@@ -28,8 +28,15 @@
             "role": "developer"
         }
     ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://satis.id"
+        }
+    ],
     "require": {
-        "php": "^8.1"
+        "php": "^8.1",
+        "vigihdev/wp-cli-models": "dev-main"
     },
     "autoload": {
         "psr-4": {
