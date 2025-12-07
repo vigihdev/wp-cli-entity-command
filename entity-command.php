@@ -15,7 +15,8 @@ $configs = [
         'menu:get' => 'Get_Menu_Command',
         'menu:export' => 'Export_Menu_Command',
         'menu:update' => 'Update_Menu_Command',
-
+    ],
+    'Vigihdev\WpCliEntityCommand\Menu\Items' => [
         'menu-item:list' => 'List_Menu_Item_Command',
         'menu-item:get' => 'Get_Menu_Item_Command',
         'menu-item:export' => 'Export_Menu_Item_Command',
