@@ -62,6 +62,7 @@
         ]
     },
     "scripts": {
+        "build": "console git:push && console satis:build && cd $HOME/.wp-cli/packages && console composer:update vigihdev/wp-cli-entity-command && cd $HOME/WordpressCli/wp-cli-entity-command",
         "dev": "php -S localhost:2172 dev.php"
     }
 }

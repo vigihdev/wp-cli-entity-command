@@ -29,13 +29,22 @@ $configs = [
         'taxonomy:list' => 'List_Taxonomy_Command'
     ],
     'Vigihdev\WpCliEntityCommand\Post' => [
-        'post:list' => 'List_Post_Command'
+        'post:list' => 'List_Post_Command',
+        'post:get' => 'Get_Post_Command',
+        'post:export' => 'Export_Post_Command',
+        'post:update' => 'Update_Post_Command',
     ],
     'Vigihdev\WpCliEntityCommand\Term' => [
         'term:list' => 'List_Term_Command',
         'term:export' => 'Export_Term_Command',
         'term:get' => 'Get_Term_Command',
         'term:update' => 'Update_Term_Command',
+    ],
+    'Vigihdev\WpCliEntityCommand\Media' => [
+        'media:list' => 'List_Media_Command',
+        'media:export' => 'Export_Media_Command',
+        'media:get' => 'Get_Media_Command',
+        'media:update' => 'Update_Media_Command',
     ],
     'Vigihdev\WpCliEntityCommand\User' => [
         'user:list' => 'List_User_Command'

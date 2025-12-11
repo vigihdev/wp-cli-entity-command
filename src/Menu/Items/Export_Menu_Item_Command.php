@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Vigihdev\WpCliEntityCommand\Menu\Items;
 
+use Vigihdev\Support\Collection;
+use Vigihdev\WpCliModels\Entities\MenuItemEntity;
+use Vigihdev\WpCliModels\UI\Styler;
 use WP_CLI;
 use WP_CLI\Utils;
 use WP_CLI_Command;
@@ -14,7 +17,7 @@ final class Export_Menu_Item_Command extends WP_CLI_Command
     private $fields = [
         'title',
         'url',
-        'tipe',
+        'type',
     ];
 
     /**
@@ -32,7 +35,7 @@ final class Export_Menu_Item_Command extends WP_CLI_Command
      * [--fields=<fields>]
      * : Menentukan fields yang akan diekspor
      * ---
-     * default: all
+     * default: type,label,title,url,items
      * options:
      *   - type
      *   - label
@@ -76,11 +79,21 @@ final class Export_Menu_Item_Command extends WP_CLI_Command
      */
     public function __invoke(array $args, array $assoc_args): void
     {
+
+        $menu_name = isset($args[0]) ? $args[0] : null;
         $is_dry_run = Utils\get_flag_value($assoc_args, 'dry-run');
         $output_file = Utils\get_flag_value($assoc_args, 'out');
         $format = Utils\get_flag_value($assoc_args, 'format', 'table');
 
         // Cek Menu name Or ID
+        if (!$menu_name || is_bool($menu_name)) {
+            WP_CLI::error("Nama menu atau id harus di tentukan");
+        }
+
+        $menuItems = MenuItemEntity::getItems($menu_name);
+        if (empty($menuItems)) {
+            WP_CLI::error("Menu Item tidak di temukan");
+        }
 
         // Dry run process
         if ($is_dry_run) {
@@ -89,6 +102,16 @@ final class Export_Menu_Item_Command extends WP_CLI_Command
             return;
         }
 
+        $collection = new Collection(
+            data: $menuItems
+        );
+        $items = $collection
+            ->map(fn($v, $k) => $v->to_array())
+            ->map(fn($v, $k) => array_filter($v, fn($k) => in_array($k, $this->fields), ARRAY_FILTER_USE_KEY))
+            ->toArray();
+
+        Styler::header("Menampilkan List Menu %Y{$menu_name}%n", '%y');
+        Utils\format_items('table', $items, $this->fields);
         // Cek Out directory
 
         WP_CLI::success("Data berhasil diekspor ke file '{$output_file}'");
