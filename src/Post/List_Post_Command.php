@@ -68,8 +68,8 @@ final class List_Post_Command extends Post_Base_Command
         $query_args = [
             'post_type'        => $assoc_args['post-type'] ?? 'post',
             'post_status'      => $assoc_args['status'] ?? 'publish',
-            'posts_per_page'   => $assoc_args['limit'] ?? 15,
-            'offset'           => $assoc_args['offset'] ?? 0,
+            'posts_per_page'   => (int) ($assoc_args['limit'] ?? 15),
+            'offset'           => (int) ($assoc_args['offset'] ?? 0),
             'orderby'          => $assoc_args['orderby'] ?? 'date',
             'order'            => $assoc_args['order'] ?? 'DESC',
             'category__in'     => isset($assoc_args['category']) ? explode(',', $assoc_args['category']) : [],
@@ -83,7 +83,6 @@ final class List_Post_Command extends Post_Base_Command
             WP_CLI::warning('No posts found.');
             return;
         }
-
 
 
         $this->process(
