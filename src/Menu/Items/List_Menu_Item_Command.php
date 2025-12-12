@@ -8,6 +8,7 @@ use Vigihdev\Support\Collection;
 use Vigihdev\WpCliEntityCommand\WP_CLI\Menu_Base_Command;
 use Vigihdev\WpCliModels\Entities\MenuEntity;
 use Vigihdev\WpCliModels\DTOs\Entities\Menu\MenuEntityDto;
+use Vigihdev\WpCliModels\Entities\MenuItemEntity;
 use Vigihdev\WpCliModels\UI\CliStyle;
 use WP_CLI;
 use WP_CLI_Command;
@@ -32,7 +33,7 @@ final class List_Menu_Item_Command extends Menu_Base_Command
         // );
 
         $io = new CliStyle();
-        $item = MenuEntity::lists();
+        $item = MenuItemEntity::get('primary');
         $this->process(io: $io, collection: $item);
     }
 
