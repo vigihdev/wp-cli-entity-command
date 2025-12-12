@@ -27,11 +27,11 @@ final class List_Menu_Item_Command extends Menu_Base_Command
      */
     public function __invoke(array $args, array $assoc_args): void
     {
-        $io = new CliStyle();
-        WP_CLI::success(
-            sprintf('Execute basic command from %s', List_Menu_Item_Command::class)
-        );
+        // WP_CLI::success(
+        //     sprintf('Execute basic command from %s', List_Menu_Item_Command::class)
+        // );
 
+        $io = new CliStyle();
         $item = MenuEntity::lists();
         $this->process(io: $io, collection: $item);
     }
