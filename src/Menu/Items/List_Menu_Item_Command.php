@@ -8,6 +8,7 @@ use Vigihdev\Support\Collection;
 use Vigihdev\WpCliEntityCommand\WP_CLI\Menu_Base_Command;
 use Vigihdev\WpCliModels\Entities\MenuEntity;
 use Vigihdev\WpCliModels\DTOs\Entities\Menu\MenuEntityDto;
+use Vigihdev\WpCliModels\DTOs\Entities\Menu\MenuItemEntityDto;
 use Vigihdev\WpCliModels\Entities\MenuItemEntity;
 use Vigihdev\WpCliModels\UI\CliStyle;
 use WP_CLI;
@@ -41,20 +42,20 @@ final class List_Menu_Item_Command extends Menu_Base_Command
     /**
      *
      * @param CliStyle $io
-     * @param Collection<MenuEntityDto> $collection
+     * @param Collection<MenuItemEntityDto> $collection
      */
     private function process(CliStyle $io, Collection $collection)
     {
         $io->title('📊 View List Menu Item', '%_');
 
         $io->table(
-            fields: ['No', 'name', 'slug', 'taxonomy'],
+            fields: ['No', 'title', 'url', 'type'],
             items: $collection->map(function ($item, $key) {
                 return [
                     $key + 1,
-                    $item->getName(),
-                    $item->getSlug(),
-                    $item->getTaxonomy(),
+                    $item->getTitle(),
+                    $item->getUrl(),
+                    $item->getType(),
                 ];
             })->toArray(),
         );
