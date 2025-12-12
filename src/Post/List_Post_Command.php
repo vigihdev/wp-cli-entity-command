@@ -19,8 +19,6 @@ final class List_Post_Command extends Post_Base_Command
     }
 
     /**
-     * wp post:list
-     * 
      * Menampilkan daftar post.
      *
      * ## OPTIONS
