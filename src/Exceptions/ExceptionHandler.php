@@ -7,7 +7,7 @@ namespace Vigihdev\WpCliEntityCommand\Exceptions;
 use Throwable;
 use Vigihdev\WpCliModels\UI\CliStyle;
 
-final class ExceptionHandler implements InterfaceException
+final class ExceptionHandler implements InterfaceHandlerException
 {
 
     public function handle(CliStyle $io, Throwable $exception): void

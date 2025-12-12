@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Vigihdev\WpCliEntityCommand\Post;
 
 use Vigihdev\Support\Collection;
+use Vigihdev\WpCliEntityCommand\Exceptions\ExceptionHandler;
+use Vigihdev\WpCliEntityCommand\Exceptions\InterfaceHandlerException;
 use Vigihdev\WpCliEntityCommand\WP_CLI\Post_Base_Command;
 use Vigihdev\WpCliModels\UI\CliStyle;
 use Vigihdev\WpCliModels\UI\Components\ListPreset;
@@ -17,9 +19,12 @@ use WP_Query;
 final class List_Post_Command extends Post_Base_Command
 {
 
+    private InterfaceHandlerException $exceptionHandler;
+
     public function __construct()
     {
-        return parent::__construct(name: 'post:list');
+        parent::__construct(name: 'post:list');
+        $this->exceptionHandler = new ExceptionHandler();
     }
 
     /**
@@ -60,7 +65,9 @@ final class List_Post_Command extends Post_Base_Command
      */
     public function __invoke(array $args, array $assoc_args)
     {
+
         $io = new CliStyle();
+
         WP_CLI::success(
             sprintf('Execute basic command from %s', Get_Post_Command::class)
         );

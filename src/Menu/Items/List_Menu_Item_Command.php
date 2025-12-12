@@ -23,7 +23,16 @@ final class List_Menu_Item_Command extends Menu_Base_Command
     }
 
     /**
-     * 
+     * Menampilkan daftar item menu.
+     *
+     * ## OPTIONS
+     *
+     * [--menu=<menu>]
+     * : Slug menu yang akan ditampilkan.
+     * ---
+     * default: primary
+     * ---
+     *
      * @param array $args Positional arguments
      * @param array $assoc_args Associative arguments (options)
      */
