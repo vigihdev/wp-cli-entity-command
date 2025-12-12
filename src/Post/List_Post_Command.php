@@ -98,10 +98,14 @@ final class List_Post_Command extends Post_Base_Command
      *
      * @param int $limit      Jumlah post yang akan ditampilkan.
      * @param int $offset     Jumlah post yang akan dilewati.
-     * @param Collection<WP_Post[]> $collection Koleksi data post.
+     * @param Collection<WP_Post> $collection Koleksi data post.
      */
     private function process(CliStyle $io, int $limit, int $offset, Collection $collection)
     {
+
+        $io = new CliStyle();
+        $io->title('📊 View List User', '%_');
+
         $io->table(
             fields: ['ID', 'Title', 'Status'],
             items: $collection->map(function ($post) {
@@ -111,6 +115,16 @@ final class List_Post_Command extends Post_Base_Command
                     $post->post_status,
                 ];
             })->toArray(),
+        );
+
+        $io->hr('-');
+        $io->line(
+            implode(' ', [
+                "   ",
+                "✅",
+                WP_CLI::colorize("%_(7)%n"),
+                $io->textGreen("item di temukan")
+            ])
         );
     }
 }
