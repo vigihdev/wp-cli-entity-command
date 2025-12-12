@@ -49,10 +49,11 @@ final class List_Menu_Item_Command extends Menu_Base_Command
         $io->title('📊 View List Menu Item', '%_');
 
         $io->table(
-            fields: ['No', 'title', 'url', 'type'],
+            fields: ['No', 'ID', 'title', 'url', 'type'],
             items: $collection->map(function ($item, $key) {
                 return [
                     $key + 1,
+                    $item->getId(),
                     $item->getTitle(),
                     $item->getUrl(),
                     $item->getType(),
