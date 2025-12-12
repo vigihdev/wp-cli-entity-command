@@ -4,44 +4,64 @@ declare(strict_types=1);
 
 namespace Vigihdev\WpCliEntityCommand\Post;
 
+use Vigihdev\WpCliEntityCommand\WP_CLI\Post_Base_Command;
+use Vigihdev\WpCliModels\UI\CliStyle;
+use Vigihdev\WpCliModels\UI\Components\ListPreset;
 use WP_CLI;
 use WP_CLI_Command;
 
-class List_Post_Command extends WP_CLI_Command
+final class List_Post_Command extends Post_Base_Command
 {
-    public function __invoke(array $args, array $assoc_args): void
+
+    public function __construct()
     {
-        $query_args = [
-            'post_type'      => $assoc_args['post-type'] ?? 'post',
-            'post_status'    => $assoc_args['status'] ?? 'publish',
-            'posts_per_page' => 5, // Limit untuk testing
-        ];
-
-        $posts = get_posts($query_args);
-
-        if (empty($posts)) {
-            WP_CLI::warning('No posts found.');
-            return;
-        }
-
-        $table_data = [];
-        foreach ($posts as $post) {
-            $table_data[] = [
-                'ID'      => $post->ID,
-                'Title'   => $post->post_title,
-                'Type'    => $post->post_type,
-                'Status'  => $post->post_status,
-                'Date'    => $post->post_date,
-                'Author'  => get_the_author_meta('display_name', $post->post_author),
-            ];
-        }
-
-        WP_CLI\Utils\format_items(
-            $assoc_args['format'] ?? 'table',
-            $table_data,
-            ['ID', 'Title', 'Type', 'Status', 'Date', 'Author']
-        );
-
-        WP_CLI::success(sprintf('Found %d post(s)', count($posts)));
+        return parent::__construct(name: 'post:list');
     }
+
+    /**
+     * wp post:list
+     * 
+     * Menampilkan daftar post.
+     *
+     * ## OPTIONS
+     * 
+     * [--limit=<limit>]
+     * : Jumlah post yang akan ditampilkan.
+     * ---
+     * default: 15
+     * ---
+     *
+     * [--offset=<offset>]
+     * : Jumlah post yang akan dilewati.
+     * ---
+     * default: 0
+     * ---
+     *
+     * [--post-type=<type>]
+     * : Tipe post yang akan diambil.
+     * ---
+     * default: post
+     * ---
+     *
+     * [--status=<status>]
+     * : Status post yang akan diambil.
+     * ---
+     * default: publish
+     * ---
+     *
+     * ## EXAMPLES
+     *
+     *     wp post:list --limit=20 --offset=5
+     *
+     * @param array $args       Argumen posisional dari perintah CLI.
+     * @param array $assoc_args Argumen asosiatif (flag) dari perintah CLI.
+     */
+    public function __invoke(array $args, array $assoc_args)
+    {
+        WP_CLI::success(
+            sprintf('Execute basic command from %s', Get_Post_Command::class)
+        );
+    }
+
+    private function process() {}
 }
