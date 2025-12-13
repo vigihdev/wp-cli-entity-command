@@ -14,6 +14,23 @@ use WP_CLI;
 final class Get_Post_Command extends Post_Base_Command
 {
 
+    /**
+     * Get post by ID
+     *
+     * ## OPTIONS
+     *
+     * <post-id>
+     * : The ID of the post to get.
+     *
+     * ## EXAMPLES
+     *
+     *     # Get post with ID 123
+     *     $ wp post:get 123
+     *
+     * @param array $args
+     * @param array $assoc_args
+     * @return void
+     */
     public function __invoke(array $args, array $assoc_args): void
     {
         $arg = isset($args[0]) ? (int) $args[0] : 0;
