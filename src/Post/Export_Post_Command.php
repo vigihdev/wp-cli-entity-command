@@ -74,7 +74,7 @@ final class Export_Post_Command extends WP_CLI_Command
             $io->errorWithIcon('Output file is required');
         }
 
-        if (!$dryRun) {
+        if ($dryRun) {
             $this->dryRunProcess($io, $limit, $output, $format);
             return;
         }
