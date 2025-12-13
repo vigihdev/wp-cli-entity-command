@@ -8,7 +8,6 @@ use Throwable;
 use Vigihdev\WpCliEntityCommand\Validator\PostValidator;
 use Vigihdev\WpCliEntityCommand\WP_CLI\Post_Base_Command;
 use Vigihdev\WpCliModels\UI\CliStyle;
-use WP_CLI;
 
 
 final class Get_Post_Command extends Post_Base_Command
