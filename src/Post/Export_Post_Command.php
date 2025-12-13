@@ -75,7 +75,7 @@ final class Export_Post_Command extends WP_CLI_Command
         }
 
         if ($dryRun) {
-            $this->dryRunProcess($io, $limit, $output, $format);
+            $this->dryRunProcess($io, $limit, $format, $output);
             return;
         }
 
@@ -87,7 +87,7 @@ final class Export_Post_Command extends WP_CLI_Command
     private function preProcess() {}
     private function process() {}
     private function exportProcess() {}
-    private function dryRunProcess(CliStyle $io, int $limit, string $output, string $format)
+    private function dryRunProcess(CliStyle $io, int $limit, string $format, string $output = null)
     {
 
         $dryRun = new DryRunPresetExport(
