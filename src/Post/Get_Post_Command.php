@@ -14,6 +14,11 @@ use WP_CLI;
 final class Get_Post_Command extends Post_Base_Command
 {
 
+    public function __construct()
+    {
+        parent::__construct(name: 'post:get');
+    }
+
     /**
      * Get post by ID
      *
