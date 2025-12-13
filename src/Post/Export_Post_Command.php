@@ -39,7 +39,9 @@ final class Export_Post_Command extends WP_CLI_Command
      * ---
      * default: ID,post_title,post_content
      * ---
-     *
+     * 
+     * [--dry-run]
+     * : Show preview of export without writing to file
      *
      * ## EXAMPLES
      *      
