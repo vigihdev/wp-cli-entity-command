@@ -4,14 +4,29 @@ declare(strict_types=1);
 
 namespace Vigihdev\WpCliEntityCommand\Post;
 
+use Symfony\Component\Filesystem\Path;
+use Vigihdev\Support\Collection;
+use Vigihdev\WpCliEntityCommand\WP_CLI\Post_Base_Command;
+use Vigihdev\WpCliModels\Entities\PostEntity;
+use Vigihdev\WpCliModels\DTOs\Entities\Post\PostEntityDto;
+use Vigihdev\WpCliModels\Formatters\JsonFormatter;
 use Vigihdev\WpCliModels\UI\CliStyle;
 use Vigihdev\WpCliModels\UI\Components\DryRunPresetExport;
+use Vigihdev\WpCliModels\UI\Components\FileInfoPreset;
 use Vigihdev\WpCliModels\UI\Components\ProcessExportPreset;
 use WP_CLI\Utils;
-use WP_CLI_Command;
 
-final class Export_Post_Command extends WP_CLI_Command
+final class Export_Post_Command extends Post_Base_Command
 {
+
+    /**
+     * @var Collection<PostEntityDto> $collection
+     */
+    private ?Collection $collection = null;
+    public function __construct()
+    {
+        parent::__construct(name: 'post:export');
+    }
 
     /**
      * Export post with specified fields
@@ -74,15 +89,18 @@ final class Export_Post_Command extends WP_CLI_Command
             $io->errorWithIcon('Output file is required');
         }
 
+        $this->collection = PostEntity::filter($limit, $offset);
+
         if ($dryRun) {
             $this->dryRunProcess($io, $limit, $format, $output);
             return;
         }
 
-        $this->preProcess($io, $limit, $format, $output);
+        $fields = explode(',', $fields);
+        $this->preProcess($io, $limit, $format, $output, $fields);
     }
 
-    private function preProcess(CliStyle $io, int $limit, string $format, string $output)
+    private function preProcess(CliStyle $io, int $limit, string $format, string $output, array $fields)
     {
 
         $process = new ProcessExportPreset(
@@ -94,20 +112,51 @@ final class Export_Post_Command extends WP_CLI_Command
             startTime: microtime(true)
         );
         $process->startRender();
+        if ($process->getSuccessAsk()) {
+            $this->exportProcess($process, $io, $fields, $output, $format);
+        }
     }
 
     private function process() {}
-    private function exportProcess() {}
+    private function exportProcess(ProcessExportPreset $process, CliStyle $io, array $fields, string $output, string $format)
+    {
+        $output = Path::isAbsolute($output) ? $output : Path::join(getcwd() ?? '', $output);
+        $data = $this->collection->map(fn($dto) => $dto->toArray())->toArray();
+        $model = new JsonFormatter($data, $fields, $output);
+        if ($model->save()) {
+
+            $io->log("");
+            $io->hr('-', 75);
+            $io->success(
+                sprintf("{$io->textGreen('Exported posts data berhasil')} %s detik", $io->highlightText($process->countingInSeconds()))
+            );
+            $io->hr('-', 75);
+
+            $fileInfo = new FileInfoPreset(io: $io, filepath: $output);
+            $fileInfo->renderList();
+            $io->log("");
+        }
+    }
+
     private function dryRunProcess(CliStyle $io, int $limit, string $format, string $output = null)
     {
 
         $dryRun = new DryRunPresetExport(
             io: $io,
             name: 'Post',
-            total: $limit,
+            total: $this->collection->count(),
             output: $output,
             format: $format
         );
-        $dryRun->renderCompact([], []);
+
+        $items = [];
+        foreach ($this->collection->getIterator() as $index => $post) {
+            $items[] = [
+                $index + 1,
+                $post->getId(),
+                $post->getTitle(),
+            ];
+        }
+        $dryRun->renderCompact($items, ['No', 'ID', 'title']);
     }
 }

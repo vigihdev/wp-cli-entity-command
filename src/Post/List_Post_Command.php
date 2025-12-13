@@ -56,7 +56,7 @@ final class List_Post_Command extends Post_Base_Command
      *
      * ## EXAMPLES
      *
-     *     wp post:list --limit=20 --offset=5
+     *     wp post:list --limit=20 --offset=0
      *
      * @param array $args       Argumen posisional dari perintah CLI.
      * @param array $assoc_args Argumen asosiatif (flag) dari perintah CLI.
