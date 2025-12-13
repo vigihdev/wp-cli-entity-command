@@ -92,7 +92,7 @@ final class Export_Post_Command extends WP_CLI_Command
 
         $dryRun = new DryRunPresetExport(
             io: $io,
-            name: 'Export Post',
+            name: 'Post',
             total: $limit,
             output: $output,
             format: $format
