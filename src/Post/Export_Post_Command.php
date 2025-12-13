@@ -6,6 +6,7 @@ namespace Vigihdev\WpCliEntityCommand\Post;
 
 use Vigihdev\WpCliModels\UI\CliStyle;
 use WP_CLI;
+use WP_CLI\Utils;
 use WP_CLI_Command;
 
 final class Export_Post_Command extends WP_CLI_Command
@@ -61,6 +62,16 @@ final class Export_Post_Command extends WP_CLI_Command
     public function __invoke(array $args, array $assoc_args): void
     {
         $io = new CliStyle();
+        $limit = (int) Utils\get_flag_value($assoc_args, 'limit', 50);
+        $offset = (int) Utils\get_flag_value($assoc_args, 'offset', 0);
+        $output = Utils\get_flag_value($assoc_args, 'output', null);
+        $fields = Utils\get_flag_value($assoc_args, 'fields', 'ID,post_title,post_content');
+        $dryRun = Utils\get_flag_value($assoc_args, 'dry-run', false);
+        $format = Utils\get_flag_value($assoc_args, 'format', 'json');
+
+        if ($output === null) {
+            $io->errorWithIcon('Output file is required');
+        }
 
         WP_CLI::success(
             sprintf('Execute basic command from %s', Export_Post_Command::class)
@@ -70,5 +81,5 @@ final class Export_Post_Command extends WP_CLI_Command
     private function preProcess() {}
     private function process() {}
     private function exportProcess() {}
-    private function dryRunProcess() {}
+    private function dryRunProcess(int $limit, string $output, string $format) {}
 }
