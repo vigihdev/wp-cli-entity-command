@@ -69,7 +69,7 @@ final class Export_Post_Command extends WP_CLI_Command
         $dryRun = Utils\get_flag_value($assoc_args, 'dry-run', false);
         $format = Utils\get_flag_value($assoc_args, 'format', 'json');
 
-        if ($output === null) {
+        if (!$dryRun && $output === null) {
             $io->errorWithIcon('Output file is required');
         }
 
