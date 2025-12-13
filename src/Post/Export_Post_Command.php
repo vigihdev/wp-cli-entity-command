@@ -42,7 +42,13 @@ final class Export_Post_Command extends WP_CLI_Command
      * 
      * [--dry-run]
      * : Show preview of export without writing to file
-     *
+     * 
+     * [--format=<format>]
+     * : Format of export file (json, txt, yaml)
+     * ---
+     * default: json
+     * ---
+     * 
      * ## EXAMPLES
      *      
      *      # Export post with ID 123 to JSON file
