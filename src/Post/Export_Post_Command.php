@@ -6,7 +6,7 @@ namespace Vigihdev\WpCliEntityCommand\Post;
 
 use Vigihdev\WpCliModels\UI\CliStyle;
 use Vigihdev\WpCliModels\UI\Components\DryRunPresetExport;
-use WP_CLI;
+use Vigihdev\WpCliModels\UI\Components\ProcessExportPreset;
 use WP_CLI\Utils;
 use WP_CLI_Command;
 
@@ -79,12 +79,23 @@ final class Export_Post_Command extends WP_CLI_Command
             return;
         }
 
-        WP_CLI::success(
-            sprintf('Execute basic command from %s', Export_Post_Command::class)
-        );
+        $this->preProcess($io, $limit, $format, $output);
     }
 
-    private function preProcess() {}
+    private function preProcess(CliStyle $io, int $limit, string $format, string $output)
+    {
+
+        $process = new ProcessExportPreset(
+            io: $io,
+            name: 'Post',
+            total: $limit,
+            output: $output,
+            format: $format,
+            startTime: microtime(true)
+        );
+        $process->startRender();
+    }
+
     private function process() {}
     private function exportProcess() {}
     private function dryRunProcess(CliStyle $io, int $limit, string $format, string $output = null)
@@ -97,6 +108,6 @@ final class Export_Post_Command extends WP_CLI_Command
             output: $output,
             format: $format
         );
-        $dryRun->renderTitle();
+        $dryRun->renderCompact([], []);
     }
 }
