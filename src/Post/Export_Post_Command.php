@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Vigihdev\WpCliEntityCommand\Post;
 
 use Vigihdev\WpCliModels\UI\CliStyle;
+use Vigihdev\WpCliModels\UI\Components\DryRunPresetExport;
 use WP_CLI;
 use WP_CLI\Utils;
 use WP_CLI_Command;
@@ -73,6 +74,11 @@ final class Export_Post_Command extends WP_CLI_Command
             $io->errorWithIcon('Output file is required');
         }
 
+        if (!$dryRun) {
+            $this->dryRunProcess($io, $limit, $output, $format);
+            return;
+        }
+
         WP_CLI::success(
             sprintf('Execute basic command from %s', Export_Post_Command::class)
         );
@@ -81,5 +87,16 @@ final class Export_Post_Command extends WP_CLI_Command
     private function preProcess() {}
     private function process() {}
     private function exportProcess() {}
-    private function dryRunProcess(int $limit, string $output, string $format) {}
+    private function dryRunProcess(CliStyle $io, int $limit, string $output, string $format)
+    {
+
+        $dryRun = new DryRunPresetExport(
+            io: $io,
+            name: 'Export Post',
+            total: $limit,
+            output: $output,
+            format: $format
+        );
+        $dryRun->renderTitle();
+    }
 }
