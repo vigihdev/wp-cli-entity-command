@@ -46,10 +46,6 @@ final class Get_Post_Command extends Post_Base_Command
         } catch (Throwable $e) {
             $this->exceptionHandler->handle($io, $e);
         }
-
-        WP_CLI::success(
-            sprintf('Execute basic command from %s', Get_Post_Command::class)
-        );
     }
 
     private function preProcess() {}
