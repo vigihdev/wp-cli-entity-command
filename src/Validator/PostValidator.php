@@ -5,13 +5,29 @@ declare(strict_types=1);
 namespace Vigihdev\WpCliEntityCommand\Validator;
 
 use Vigihdev\WpCliEntityCommand\Exceptions\PostException;
+use WP;
+use WP_Post;
 
 final class PostValidator
 {
+    private ?WP_Post $post = null;
+    public function __construct(
+        private readonly int $id
+    ) {
+        $this->post = get_post($this->id);
+    }
+
+    public function mustExist(): void
+    {
+        if (!$this->post) {
+            throw PostException::notFound($this->id);
+        }
+    }
+
     /**
      * Validate post data before creation/update
      */
-    public static function validate(array $postData): void
+    private static function validateed(array $postData): void
     {
         if (empty($postData['post_title'])) {
             throw new PostException('Judul post tidak boleh kosong');
@@ -26,13 +42,8 @@ final class PostValidator
         }
     }
 
-    /**
-     * Validate post ID exists
-     */
-    public static function validateId(int $postId): void
+    public static function validate(int $postId): self
     {
-        if (!get_post($postId)) {
-            throw PostException::notFound($postId);
-        }
+        return new self($postId);
     }
 }

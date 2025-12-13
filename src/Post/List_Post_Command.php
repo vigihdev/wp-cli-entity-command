@@ -19,12 +19,10 @@ use WP_Query;
 final class List_Post_Command extends Post_Base_Command
 {
 
-    private InterfaceHandlerException $exceptionHandler;
 
     public function __construct()
     {
         parent::__construct(name: 'post:list');
-        $this->exceptionHandler = new ExceptionHandler();
     }
 
     /**
