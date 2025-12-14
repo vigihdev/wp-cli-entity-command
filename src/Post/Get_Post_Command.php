@@ -7,6 +7,7 @@ namespace Vigihdev\WpCliEntityCommand\Post;
 use Throwable;
 use Vigihdev\WpCliEntityCommand\Validator\PostValidator;
 use Vigihdev\WpCliEntityCommand\WP_CLI\Post_Base_Command;
+use Vigihdev\WpCliModels\Entities\PostEntity;
 use Vigihdev\WpCliModels\UI\CliStyle;
 
 
@@ -45,6 +46,28 @@ final class Get_Post_Command extends Post_Base_Command
         } catch (Throwable $e) {
             $this->exceptionHandler->handle($io, $e);
         }
+
+        $post = PostEntity::get($arg);
+
+        $io->log('');
+        $io->line(
+            sprintf("🔥 %s", $io->textGreen('Post Details'))
+        );
+
+        $io->hr('-', 75);
+        $this->line('ID', (string) $post->getId());
+        $this->line('Title', $post->getTitle());
+        $this->line('Status', $post->getStatus());
+        $this->line('Type', $post->getType());
+        $io->hr('-', 75);
+    }
+
+    private function line(string $lsbel, string $value)
+    {
+        $io = new CliStyle();
+        $io->line(
+            sprintf("🏮 %s : %s", $io->highlightText($lsbel), $io->textGreen($value, '%g'))
+        );
     }
 
     private function preProcess() {}
