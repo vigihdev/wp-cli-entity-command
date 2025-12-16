@@ -40,6 +40,12 @@ $configs = [
         'term:get' => 'Get_Term_Command',
         'term:update' => 'Update_Term_Command',
     ],
+    'Vigihdev\WpCliEntityCommand\Term\Category' => [
+        'term-category:list' => 'List_Term_Category_Command',
+        'term-category:get' => 'Get_Term_Category_Command',
+        'term-category:export' => 'Export_Term_Category_Command',
+        'term-category:update' => 'Update_Term_Category_Command',
+    ],
     'Vigihdev\WpCliEntityCommand\Media' => [
         'media:list' => 'List_Media_Command',
         'media:export' => 'Export_Media_Command',

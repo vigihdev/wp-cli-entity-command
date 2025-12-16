@@ -5,16 +5,10 @@ declare(strict_types=1);
 namespace Vigihdev\WpCliEntityCommand\Post;
 
 use Vigihdev\Support\Collection;
-use Vigihdev\WpCliEntityCommand\Exceptions\ExceptionHandler;
-use Vigihdev\WpCliEntityCommand\Exceptions\InterfaceHandlerException;
 use Vigihdev\WpCliEntityCommand\WP_CLI\Post_Base_Command;
 use Vigihdev\WpCliModels\UI\CliStyle;
-use Vigihdev\WpCliModels\UI\Components\ListPreset;
 use WP_CLI;
-use WP_CLI\Iterators\Query;
-use WP_CLI_Command;
 use WP_Post;
-use WP_Query;
 
 final class List_Post_Command extends Post_Base_Command
 {
@@ -66,10 +60,6 @@ final class List_Post_Command extends Post_Base_Command
 
         $io = new CliStyle();
 
-        WP_CLI::success(
-            sprintf('Execute basic command from %s', Get_Post_Command::class)
-        );
-
         $query_args = [
             'post_type'        => $assoc_args['post-type'] ?? 'post',
             'post_status'      => $assoc_args['status'] ?? 'publish',
@@ -109,7 +99,7 @@ final class List_Post_Command extends Post_Base_Command
     {
 
         $io = new CliStyle();
-        $io->title('📊 View List User', '%_');
+        $io->title('📊 View List User', '%C');
 
         $io->table(
             fields: ['ID', 'Title', 'Status'],

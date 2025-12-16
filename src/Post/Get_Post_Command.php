@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Vigihdev\WpCliEntityCommand\Post;
 
 use Throwable;
-use Vigihdev\WpCliEntityCommand\Validator\PostValidator;
 use Vigihdev\WpCliEntityCommand\WP_CLI\Post_Base_Command;
+use Vigihdev\WpCliModels\DTOs\Entities\Post\PostEntityDto;
 use Vigihdev\WpCliModels\Entities\PostEntity;
 use Vigihdev\WpCliModels\UI\CliStyle;
-
+use Vigihdev\WpCliModels\Validators\PostValidator;
 
 final class Get_Post_Command extends Post_Base_Command
 {
+
+    private PostEntityDto $post;
 
     public function __construct()
     {
@@ -42,34 +44,27 @@ final class Get_Post_Command extends Post_Base_Command
         $io = new CliStyle();
 
         try {
-            PostValidator::validate($arg)->mustExist();
+            PostValidator::validate($arg)->mustBeExist();
+            $this->post = PostEntity::get($arg);
+            $this->process($io);
         } catch (Throwable $e) {
             $this->exceptionHandler->handle($io, $e);
         }
+    }
 
-        $post = PostEntity::get($arg);
-
+    private function process(CliStyle $io)
+    {
+        $post = $this->post;
         $io->log('');
         $io->line(
             sprintf("🔥 %s", $io->textGreen('Post Details'))
         );
 
         $io->hr('-', 75);
-        $this->line('ID', (string) $post->getId());
-        $this->line('Title', $post->getTitle());
-        $this->line('Status', $post->getStatus());
-        $this->line('Type', $post->getType());
+        $io->listLabel(
+            [(string) $post->getId(), $post->getTitle(), $post->getStatus(), $post->getType()],
+            ['ID', 'Title', 'Status', 'Type']
+        );
         $io->hr('-', 75);
     }
-
-    private function line(string $lsbel, string $value)
-    {
-        $io = new CliStyle();
-        $io->line(
-            sprintf("🏮 %s : %s", $io->highlightText($lsbel), $io->textGreen($value, '%g'))
-        );
-    }
-
-    private function preProcess() {}
-    private function process() {}
 }

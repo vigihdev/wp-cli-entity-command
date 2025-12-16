@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Vigihdev\WpCliEntityCommand\Post;
 
 use Symfony\Component\Filesystem\Path;
+use Throwable;
 use Vigihdev\Support\Collection;
 use Vigihdev\WpCliEntityCommand\WP_CLI\Post_Base_Command;
 use Vigihdev\WpCliModels\Entities\PostEntity;
 use Vigihdev\WpCliModels\DTOs\Entities\Post\PostEntityDto;
 use Vigihdev\WpCliModels\Formatters\JsonFormatter;
 use Vigihdev\WpCliModels\UI\CliStyle;
-use Vigihdev\WpCliModels\UI\Components\DryRunPresetExport;
-use Vigihdev\WpCliModels\UI\Components\FileInfoPreset;
-use Vigihdev\WpCliModels\UI\Components\ProcessExportPreset;
+use Vigihdev\WpCliModels\UI\Components\{DryRunPresetExport, FileInfoPreset, ProcessExportPreset};
+use Vigihdev\WpCliModels\Validators\FileValidator;
 use WP_CLI\Utils;
 
 final class Export_Post_Command extends Post_Base_Command
@@ -23,6 +23,7 @@ final class Export_Post_Command extends Post_Base_Command
      * @var Collection<PostEntityDto> $collection
      */
     private ?Collection $collection = null;
+
     public function __construct()
     {
         parent::__construct(name: 'post:export');
@@ -77,6 +78,8 @@ final class Export_Post_Command extends Post_Base_Command
      */
     public function __invoke(array $args, array $assoc_args): void
     {
+
+
         $io = new CliStyle();
         $limit = (int) Utils\get_flag_value($assoc_args, 'limit', 50);
         $offset = (int) Utils\get_flag_value($assoc_args, 'offset', 0);
@@ -91,13 +94,25 @@ final class Export_Post_Command extends Post_Base_Command
 
         $this->collection = PostEntity::filter($limit, $offset);
 
+        if ($this->collection->isEmpty()) {
+            $io->logInfo('No posts found');
+            return;
+        }
+
         if ($dryRun) {
             $this->dryRunProcess($io, $limit, $format, $output);
             return;
         }
 
-        $fields = explode(',', $fields);
-        $this->preProcess($io, $limit, $format, $output, $fields);
+        try {
+            $filepath = Path::isAbsolute($output) ? $output : Path::join(getcwd() ?? '', $output);
+            FileValidator::validate($filepath)
+                ->mustBeExtension('json');
+            $fields = explode(',', $fields);
+            $this->preProcess($io, $limit, $format, $output, $fields);
+        } catch (Throwable $e) {
+            $this->exceptionHandler->handle($io, $e);
+        }
     }
 
     private function preProcess(CliStyle $io, int $limit, string $format, string $output, array $fields)
@@ -117,7 +132,6 @@ final class Export_Post_Command extends Post_Base_Command
         }
     }
 
-    private function process() {}
     private function exportProcess(ProcessExportPreset $process, CliStyle $io, array $fields, string $output, string $format)
     {
         $output = Path::isAbsolute($output) ? $output : Path::join(getcwd() ?? '', $output);

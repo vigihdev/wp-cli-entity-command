@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace Vigihdev\WpCliEntityCommand\WP_CLI;
 
-use Vigihdev\WpCliEntityCommand\Exceptions\{ExceptionHandler, InterfaceHandlerException};
+use Vigihdev\WpCliModels\Exceptions\Handler\{HandlerExceptionInterface, WpCliExceptionHandler};
 use WP_CLI_Command;
 
 abstract class Post_Base_Command extends WP_CLI_Command
 {
 
-    protected InterfaceHandlerException $exceptionHandler;
+    protected HandlerExceptionInterface $exceptionHandler;
     public function __construct(
         protected string $name
     ) {
+
         parent::__construct();
-        $this->exceptionHandler = new ExceptionHandler();
+        $this->exceptionHandler = new WpCliExceptionHandler();
     }
 }

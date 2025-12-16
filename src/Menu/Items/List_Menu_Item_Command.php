@@ -38,13 +38,15 @@ final class List_Menu_Item_Command extends Menu_Base_Command
      */
     public function __invoke(array $args, array $assoc_args): void
     {
-        // WP_CLI::success(
-        //     sprintf('Execute basic command from %s', List_Menu_Item_Command::class)
-        // );
 
         $io = new CliStyle();
-        $item = MenuItemEntity::get('primary');
-        $this->process(io: $io, collection: $item);
+
+        $menus = MenuEntity::lists();
+        foreach ($menus as $menu) {
+            if ($menu instanceof MenuEntityDto) {
+                $this->process(io: $io, collection: MenuItemEntity::get($menu->getName()));
+            }
+        }
     }
 
 
@@ -55,10 +57,10 @@ final class List_Menu_Item_Command extends Menu_Base_Command
      */
     private function process(CliStyle $io, Collection $collection)
     {
-        $io->title('📊 View List Menu Item', '%_');
+        $io->title('📊 View List Menu Item', '%C');
 
         $io->table(
-            fields: ['No', 'ID', 'title', 'url', 'type'],
+            fields: ['No', 'ID', 'title', 'url', 'type', 'parentID'],
             items: $collection->map(function ($item, $key) {
                 return [
                     $key + 1,
@@ -66,10 +68,9 @@ final class List_Menu_Item_Command extends Menu_Base_Command
                     $item->getTitle(),
                     $item->getUrl(),
                     $item->getType(),
+                    $item->getParent(),
                 ];
             })->toArray(),
         );
-
-        $io->hr('-');
     }
 }
