@@ -6,9 +6,10 @@ namespace Vigihdev\WpCliEntityCommand\Term\Category;
 
 use Throwable;
 use Vigihdev\WpCliEntityCommand\WP_CLI\Term_Base_Command;
-use Vigihdev\Support\Collection;
-use Vigihdev\WpCliModels\DTOs\Entities\Terms\TermEntityDto;
+use Vigihdev\WpCliModels\DTOs\Entities\Terms\CategoryEntityDto;
+use Vigihdev\WpCliModels\Entities\CategoryEntity;
 use Vigihdev\WpCliModels\UI\CliStyle;
+use Vigihdev\WpCliModels\UI\Themes\MinimalTheme;
 use Vigihdev\WpCliModels\Validators\TermValidator;
 
 final class Get_Term_Category_Command extends Term_Base_Command
@@ -56,10 +57,24 @@ final class Get_Term_Category_Command extends Term_Base_Command
         try {
             TermValidator::validate($term, 'category')
                 ->mustExist();
+            $category = CategoryEntity::get($term);
+            $this->process($io, $category);
         } catch (Throwable $e) {
             $this->exceptionHandler->handle($io, $e);
         }
     }
 
-    private function process(CliStyle $io, TermEntityDto $term): void {}
+    private function process(CliStyle $io, CategoryEntityDto $category): void
+    {
+
+        $view = new MinimalTheme($io, 'Term Category');
+        $view->viewDetail([
+            (string) $category->getTermId(),
+            $category->getName(),
+            $category->getSlug(),
+            $category->getTaxonomy(),
+            (string) $category->getCount(),
+        ], ['term_id', 'term_name', 'term_slug', 'term_taxonomy', 'count']);
+        $io->log('');
+    }
 }

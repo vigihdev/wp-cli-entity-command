@@ -9,6 +9,11 @@ use Vigihdev\WpCliEntityCommand\WP_CLI\Term_Base_Command;
 final class Export_Term_Category_Command extends Term_Base_Command
 {
 
+    public function __construct()
+    {
+        parent::__construct(name: 'term-category:export');
+    }
+
     /**
      * @param array $args
      * @param array $assoc_args
