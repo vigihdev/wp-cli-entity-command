@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Vigihdev\WpCliEntityCommand\Term\Category;
 
-use Throwable;
 use Vigihdev\Support\Collection;
 use Vigihdev\WpCliEntityCommand\WP_CLI\Term_Base_Command;
 use Vigihdev\WpCliModels\DTOs\Entities\Terms\CategoryEntityDto;
 use Vigihdev\WpCliModels\Entities\CategoryEntity;
 use Vigihdev\WpCliModels\UI\CliStyle;
-use Vigihdev\WpCliModels\UI\Themes\MinimalTheme;
-use Vigihdev\WpCliModels\Validators\TermValidator;
 
 
 final class List_Term_Category_Command extends Term_Base_Command
@@ -95,9 +92,11 @@ final class List_Term_Category_Command extends Term_Base_Command
      */
     private function process(CliStyle $io, Collection $collection): void
     {
+
         $io->title(
             sprintf("📁 %s", $io->textGreen("List Term Category"))
         );
+
         $items = [];
         foreach ($collection->getIterator() as $i => $category) {
             $items[] = [
@@ -112,14 +111,6 @@ final class List_Term_Category_Command extends Term_Base_Command
         $io->table($items, ['No', 'term_id', 'term_name', 'term_slug', 'term_taxonomy', 'count']);
         $io->log('');
 
-        // $io->summary(
-        //     sprintf('   %s Total: %d', '📁', $collection->count()),
-        //     sprintf('   %s Posts: %d', '📄', array_sum($collection->map(fn($cat) => $cat->getCount())->toArray())),
-        //     sprintf('   %s Average: %.1f', '⚖️', $collection->count()),
-        //     sprintf('   %s Empty: %d', '📭', $collection->filter(fn($cat) => $cat->getSlug() === 'tak-berkategori')->first()->getCategoryCount()),
-
-        // );
-
         $io->line("📊 {$io->textGreen("Summary:")}");
         $io->definitionList([
             'Categories' => $collection->count(),
@@ -127,8 +118,5 @@ final class List_Term_Category_Command extends Term_Base_Command
             'Avg Posts/Cat' => $collection->count() > 0 ? array_sum($collection->map(fn($cat) => $cat->getCount())->toArray()) / $collection->count() : 0,
             'Empty' => $collection->filter(fn($cat) => $cat->getSlug() === 'tak-berkategori')->first()->getCategoryCount(),
         ], true);
-        // $io->line('📈 Overview');
-        // $io->listing([
-        // ]);
     }
 }

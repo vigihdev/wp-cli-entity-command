@@ -11,39 +11,31 @@ use Vigihdev\WpCliModels\Entities\CategoryEntity;
 use Vigihdev\WpCliModels\UI\CliStyle;
 use Vigihdev\WpCliModels\Validators\TermValidator;
 
-final class Get_Term_Category_Command extends Term_Base_Command
+final class Delete_Term_Category_Command extends Term_Base_Command
 {
-
+    private const TAXONOMY = 'category';
     public function __construct()
     {
-        parent::__construct(name: 'term-category:get');
+        parent::__construct(name: 'term-category:delete');
     }
-
     /**
-     * Get a term category by its slug or ID.
+     * Delete a term category by its slug or ID.
      * 
      * ## OPTIONS
      * 
      * <term>
      * : The term slug or ID.
      * 
-     * [--format=<format>]
-     * : Export format
-     * ---
-     * default: table
-     * options:
-     *   - table
-     *   - json
-     *   - xml
-     * ---
+     * [--force]
+     * : Force delete the term category.
      * 
      * ## EXAMPLES
      * 
-     *     # Get a term category by its slug.
-     *     $ wp term-category:get category-slug
+     *     # Delete a term category by its slug.
+     *     $ wp term-category:delete category-slug
      *     
-     *     # Get a term category by its ID.
-     *     $ wp term-category:get 123 --format=json
+     *     # Delete a term category by its ID.
+     *     $ wp term-category:delete 123 --force
      * 
      * @param array $args
      * @param array $assoc_args
@@ -54,7 +46,7 @@ final class Get_Term_Category_Command extends Term_Base_Command
         $io = new CliStyle();
 
         try {
-            TermValidator::validate($term, 'category')
+            TermValidator::validate($term, self::TAXONOMY)
                 ->mustExist();
             $category = CategoryEntity::get($term);
             $this->process($io, $category);
@@ -62,20 +54,9 @@ final class Get_Term_Category_Command extends Term_Base_Command
             $this->exceptionHandler->handle($io, $e);
         }
     }
-
     private function process(CliStyle $io, CategoryEntityDto $category): void
     {
-
-        $io->title(
-            sprintf("📁 %s", $io->textGreen("Term Category"))
-        );
-        $io->definitionList([
-            'Term ID' => (string) $category->getTermId(),
-            'Term Name' => $category->getName(),
-            'Term Slug' => $category->getSlug(),
-            'Term Taxonomy' => $category->getTaxonomy(),
-            'Count' => (string) $category->getCount(),
-        ], true);
-        $io->log('');
+        // $io->confirm(sprintf('Are you sure you want to delete term category %s?', $category->getName()), $assume_yes: false);
+        // $io->success(sprintf('Term category %s has been deleted.', $category->getName()));
     }
 }

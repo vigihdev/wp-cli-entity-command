@@ -22,6 +22,13 @@ $configs = [
         'menu-item:export' => 'Export_Menu_Item_Command',
         'menu-item:update' => 'Update_Menu_Item_Command',
     ],
+    'Vigihdev\WpCliEntityCommand\Menu\Items\Custome' => [
+        'menu-item-custome:list' => 'List_Menu_Item_Custome_Command',
+        'menu-item-custome:get' => 'Get_Menu_Item_Custome_Command',
+        'menu-item-custome:export' => 'Export_Menu_Item_Custome_Command',
+        'menu-item-custome:update' => 'Update_Menu_Item_Custome_Command',
+        'menu-item-custome:delete' => 'Delete_Menu_Item_Custome_Command',
+    ],
     'Vigihdev\WpCliEntityCommand\Category' => [
         'category:list' => 'List_Category_Command',
     ],
