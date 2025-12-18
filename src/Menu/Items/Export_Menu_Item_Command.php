@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Vigihdev\WpCliEntityCommand\Menu\Items;
 
-use Vigihdev\Support\Collection;
-use Vigihdev\WpCliModels\Entities\MenuItemEntity;
-use Vigihdev\WpCliModels\UI\Styler;
+use Vigihdev\WpCliEntityCommand\WP_CLI\Menu_Base_Command;
 use WP_CLI;
 use WP_CLI\Utils;
 use WP_CLI_Command;
 
-final class Export_Menu_Item_Command extends WP_CLI_Command
+final class Export_Menu_Item_Command extends Menu_Base_Command
 {
 
     private $fields = [
@@ -19,6 +17,11 @@ final class Export_Menu_Item_Command extends WP_CLI_Command
         'url',
         'type',
     ];
+
+    public function __construct()
+    {
+        return parent::__construct('menu-item:export');
+    }
 
     /**
      * Mengekspor item menu berdasarkan kriteria tertentu
@@ -84,38 +87,6 @@ final class Export_Menu_Item_Command extends WP_CLI_Command
         $is_dry_run = Utils\get_flag_value($assoc_args, 'dry-run');
         $output_file = Utils\get_flag_value($assoc_args, 'out');
         $format = Utils\get_flag_value($assoc_args, 'format', 'table');
-
-        // Cek Menu name Or ID
-        if (!$menu_name || is_bool($menu_name)) {
-            WP_CLI::error("Nama menu atau id harus di tentukan");
-        }
-
-        $menuItems = MenuItemEntity::getItems($menu_name);
-        if (empty($menuItems)) {
-            WP_CLI::error("Menu Item tidak di temukan");
-        }
-
-        // Dry run process
-        if ($is_dry_run) {
-            WP_CLI::line('DRY RUN: Berikut adalah data yang akan diekspor:');
-            WP_CLI::line('');
-            return;
-        }
-
-        $collection = new Collection(
-            data: $menuItems
-        );
-        $items = $collection
-            ->map(fn($v, $k) => $v->to_array())
-            ->map(fn($v, $k) => array_filter($v, fn($k) => in_array($k, $this->fields), ARRAY_FILTER_USE_KEY))
-            ->toArray();
-
-        Styler::header("Menampilkan List Menu %Y{$menu_name}%n", '%y');
-        Utils\format_items('table', $items, $this->fields);
-        // Cek Out directory
-
-        WP_CLI::success("Data berhasil diekspor ke file '{$output_file}'");
-        WP_CLI::success('Ekspor menu item berhasil dilakukan');
     }
 
     private function display(string $format, array $assoc_args): void {}
