@@ -7,9 +7,16 @@ namespace Vigihdev\WpCliEntityCommand\Taxonomy;
 use WP_CLI;
 use WP_CLI_Command;
 use WP_CLI\Formatter;
+use Vigihdev\WpCliModels\UI\CliStyle;
+use Vigihdev\WpCliEntityCommand\WP_CLI\Taxonomy_Base_Command;
 
-final class List_Taxonomy_Command extends WP_CLI_Command
+final class List_Taxonomy_Command extends Taxonomy_Base_Command
 {
+
+    public function __construct()
+    {
+        parent::__construct(name: 'taxonomy:list');
+    }
 
     /**
      * Lists all registered taxonomies in WordPress.
@@ -68,85 +75,12 @@ final class List_Taxonomy_Command extends WP_CLI_Command
      */
     public function __invoke(array $args, array $assoc_args): void
     {
-        // Get all registered taxonomies
-        $taxonomies = get_taxonomies([], 'objects');
+        $io = new CliStyle();
+    }
 
-        // Filter by object type if specified
-        if (isset($assoc_args['object-type'])) {
-            $object_type = $assoc_args['object-type'];
-            $taxonomies = array_filter($taxonomies, function ($taxonomy) use ($object_type) {
-                return in_array($object_type, $taxonomy->object_type);
-            });
-        }
+    public function process(CliStyle $io): void
+    {
 
-        // Filter by public status if specified
-        if (isset($assoc_args['public'])) {
-            $public = filter_var($assoc_args['public'], FILTER_VALIDATE_BOOLEAN);
-            $taxonomies = array_filter($taxonomies, function ($taxonomy) use ($public) {
-                return $taxonomy->public === $public;
-            });
-        }
-
-        // Filter by hierarchical status if specified
-        if (isset($assoc_args['hierarchical'])) {
-            $hierarchical = filter_var($assoc_args['hierarchical'], FILTER_VALIDATE_BOOLEAN);
-            $taxonomies = array_filter($taxonomies, function ($taxonomy) use ($hierarchical) {
-                return $taxonomy->hierarchical === $hierarchical;
-            });
-        }
-
-        // Filter out built-in taxonomies if not specified
-        if (!isset($assoc_args['show-builtin'])) {
-            $taxonomies = array_filter($taxonomies, function ($taxonomy) {
-                return !in_array($taxonomy->name, ['category', 'post_tag', 'nav_menu', 'link_category', 'post_format']);
-            });
-        }
-
-        // Search filter if specified
-        if (isset($assoc_args['search'])) {
-            $search = strtolower($assoc_args['search']);
-            $taxonomies = array_filter($taxonomies, function ($taxonomy) use ($search) {
-                return strpos(strtolower($taxonomy->name), $search) !== false ||
-                    strpos(strtolower($taxonomy->label), $search) !== false;
-            });
-        }
-
-        // Prepare data for output
-        $data = [];
-        foreach ($taxonomies as $taxonomy) {
-            $data[] = [
-                'name'           => $taxonomy->name,
-                'label'          => $taxonomy->label,
-                'object_type'    => implode(', ', $taxonomy->object_type),
-                'public'         => $taxonomy->public ? '✓' : '✗',
-                'hierarchical'   => $taxonomy->hierarchical ? '✓' : '✗',
-                'show_ui'        => $taxonomy->show_ui ? '✓' : '✗',
-                'show_in_menu'   => $taxonomy->show_in_menu ? '✓' : '✗',
-                'show_admin_column' => $taxonomy->show_admin_column ? '✓' : '✗',
-                'rewrite'        => $taxonomy->rewrite ? '✓' : '✗',
-                'query_var'      => $taxonomy->query_var ? '✓' : '✗',
-                'capabilities'   => implode(', ', array_keys((array)$taxonomy->cap)),
-            ];
-        }
-
-        // Default fields if not specified
-        $default_fields = ['name', 'label', 'object_type', 'public', 'hierarchical'];
-
-        // Create formatter
-        $formatter = new Formatter($assoc_args, $default_fields);
-
-        // Display results
-        if ('count' === $formatter->format) {
-            WP_CLI::log(count($data));
-        } else {
-            $formatter->display_items($data);
-        }
-
-        // Show summary
-        if (empty($data)) {
-            WP_CLI::warning('No taxonomies found.');
-        } else {
-            WP_CLI::success(sprintf('Found %d taxonomy(ies)', count($data)));
-        }
+        $io->title("📊 List Taxonomies", '%C');
     }
 }

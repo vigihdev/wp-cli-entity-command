@@ -33,7 +33,8 @@ $configs = [
         'category:list' => 'List_Category_Command',
     ],
     'Vigihdev\WpCliEntityCommand\Taxonomy' => [
-        'taxonomy:list' => 'List_Taxonomy_Command'
+        'taxonomy:list' => 'List_Taxonomy_Command',
+        'taxonomy:get' => 'Get_Taxonomy_Command',
     ],
     'Vigihdev\WpCliEntityCommand\Post' => [
         'post:list' => 'List_Post_Command',

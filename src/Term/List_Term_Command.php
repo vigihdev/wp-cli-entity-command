@@ -6,9 +6,16 @@ namespace Vigihdev\WpCliEntityCommand\Term;
 
 use WP_CLI;
 use WP_CLI_Command;
+use Vigihdev\WpCliEntityCommand\WP_CLI\Term_Base_Command;
+use Vigihdev\WpCliModels\UI\CliStyle;
 
-class List_Term_Command extends WP_CLI_Command
+final class List_Term_Command extends Term_Base_Command
 {
+    public function __construct()
+    {
+        parent::__construct(name: 'term:list');
+    }
+
     /**
      * List terms in any taxonomy
      *
@@ -45,6 +52,7 @@ class List_Term_Command extends WP_CLI_Command
      */
     public function __invoke(array $args, array $assoc_args): void
     {
+        $io = new CliStyle();
         // REQUIRED: taxonomy parameter
         if (!isset($assoc_args['taxonomy'])) {
             WP_CLI::error('Missing required parameter: --taxonomy');
@@ -96,5 +104,10 @@ class List_Term_Command extends WP_CLI_Command
             count($terms),
             $taxonomy
         ));
+    }
+
+    public function process(CliStyle $io): void
+    {
+        $io->title("📊 List Terms", '%C');
     }
 }
