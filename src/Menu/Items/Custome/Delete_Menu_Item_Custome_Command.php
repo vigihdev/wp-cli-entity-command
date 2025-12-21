@@ -5,24 +5,22 @@ declare(strict_types=1);
 namespace Vigihdev\WpCliEntityCommand\Menu\Items\Custome;
 
 use Vigihdev\WpCliEntityCommand\WP_CLI\Menu_Base_Command;
-use Vigihdev\WpCliModels\Entities\MenuItemEntity;
-use Vigihdev\WpCliModels\Entities\TermRelationships;
+use Vigihdev\WpCliModels\Entities\{MenuItemEntity, TermRelationships};
+use Vigihdev\WpCliModels\Enums\MenuItemType;
 use Vigihdev\WpCliModels\UI\CliStyle;
 use Vigihdev\WpCliModels\Validators\MenuItemValidator;
-use WP_CLI\Context\Cli;
+use WP_CLI\Utils;
+
 
 final class Delete_Menu_Item_Custome_Command extends Menu_Base_Command
 {
-    private const TYPE = 'custom';
+    private TermRelationships $termRelations;
     public function __construct()
     {
         parent::__construct(name: 'menu-item-custome:delete');
     }
 
     /**
-     * Menghapus item menu kustom
-     * 
-     * ## DESCRIPTION
      * 
      * Menghapus item menu kustom berdasarkan ID.
      * 
@@ -31,7 +29,8 @@ final class Delete_Menu_Item_Custome_Command extends Menu_Base_Command
      * <menu-item-id>
      * : ID item menu kustom yang akan dihapus.
      * 
-     * # EXAMPLES
+     * [--dry-run]
+     * : Menampilkan item menu kustom yang akan dihapus tanpa menghapusnya.
      * 
      * ## EXAMPLES
      * 
@@ -45,29 +44,66 @@ final class Delete_Menu_Item_Custome_Command extends Menu_Base_Command
     {
         $io = new CliStyle();
         $id = (int)($args[0] ?? 0);
+        $dryRun = Utils\get_flag_value($assoc_args, 'dry-run', false);
 
         try {
-            MenuItemValidator::validate($id)
-                ->mustExist();
-            $items = iterator_to_array(TermRelationships::findByPostId($id));
-            $item = current($items);
-            $this->preProcess($io, $item);
+            MenuItemValidator::validate($id)->mustExist();
+
+            $termRelations = iterator_to_array(TermRelationships::findByPostId($id));
+            $termRelation = current($termRelations);
+            $this->termRelations = $termRelation;
+            MenuItemValidator::validate($id, $termRelation->getTermDto()->getTermId())
+                ->mustSameAsItemType(MenuItemType::CUSTOM->value);
+
+            // Process dry run
+            if ($dryRun) {
+                $this->dryRun($io);
+                return;
+            }
+
+            // Process pre
+            $this->preProcess($io);
         } catch (\Throwable $e) {
             $this->exceptionHandler->handle($io, $e);
         }
     }
 
-    private function preProcess(CliStyle $io, TermRelationships $terms): void
+    private function dryRun(CliStyle $io): void
+    {
+        $post = $this->termRelations->getPostDto();
+        $term = $this->termRelations->getTermDto();
+        $dryRun = $io->renderDryRunPreset('Menu item custom delete');
+
+        $dryRun->addInfo(
+            "Menu item custom dengan ID {$post->getId()} akan dihapus secara permanen.",
+            "Data tidak dapat di kembalikan setelah dihapus.",
+            "Jika memiliki child items, mereka mungkin terpengaruh."
+        )
+            ->addDefinition([
+                'ID' => $post->getId(),
+                'Title' => $post->getTitle(),
+                'Url' => get_permalink($post->getId()),
+                'Tipe' => $post->getType(),
+                'Taxonomy' => $term->getTaxonomy(),
+                'Slug' => $term->getSlug(),
+            ])->render();
+    }
+
+
+    private function preProcess(CliStyle $io): void
     {
 
-        $post = $terms->getPostDto();
-        $term = $terms->getTermDto();
+        $post = $this->termRelations->getPostDto();
+        $term = $this->termRelations->getTermDto();
+        $menuItem = $this->termRelations->getMenuItemDto();
+
         $io->renderAsk()->delete(
-            dataLabel: 'Menu Item Kustom',
+            dataLabel: 'Menu Item Custom',
             dataItems: [
                 'ID' => $post->getId(),
-                'Nama' => $post->getTitle(),
-                'Tipe' => $post->getType(),
+                'Title' => $post->getTitle(),
+                'Tipe' => $menuItem->getType(),
+                'Created' => $post->getDate(),
                 'Taxonomy' => $term->getTaxonomy(),
                 'Slug' => $term->getSlug(),
             ],
@@ -75,7 +111,19 @@ final class Delete_Menu_Item_Custome_Command extends Menu_Base_Command
                 '. Jika ada child items, mereka mungkin terpengaruh',
             ]
         );
+
+        $this->process($io, $post->getId());
     }
 
-    private function process(CliStyle $io, MenuItemEntity $menu): void {}
+    private function process(CliStyle $io, int $postId): void
+    {
+
+        $deleted = MenuItemEntity::delete($postId);
+
+        if (!$deleted) {
+            $io->renderBlock("Menu item custom ID {$postId} failed to delete.")->error();
+            return;
+        }
+        $io->renderBlock("Menu item custom ID {$postId} deleted successfully.")->success();
+    }
 }

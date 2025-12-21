@@ -7,12 +7,13 @@ namespace Vigihdev\WpCliEntityCommand\Post;
 use Vigihdev\Support\Collection;
 use Vigihdev\WpCliEntityCommand\WP_CLI\Post_Base_Command;
 use Vigihdev\WpCliModels\UI\CliStyle;
-use WP_CLI;
 use WP_Post;
 
 final class List_Post_Command extends Post_Base_Command
 {
 
+
+    private array $queryArgs = [];
 
     public function __construct()
     {
@@ -26,31 +27,59 @@ final class List_Post_Command extends Post_Base_Command
      * 
      * [--limit=<limit>]
      * : Jumlah post yang akan ditampilkan.
-     * ---
-     * default: 15
+     * default: 20
      * ---
      *
      * [--offset=<offset>]
      * : Jumlah post yang akan dilewati.
-     * ---
      * default: 0
      * ---
      *
      * [--post-type=<type>]
      * : Tipe post yang akan diambil.
-     * ---
      * default: post
      * ---
      *
      * [--status=<status>]
      * : Status post yang akan diambil.
-     * ---
      * default: publish
+     * ---
+     * 
+     * [--orderby=<orderby>]
+     * : Field yang akan digunakan untuk pengurutan.
+     * default: date
+     * ---
+     *
+     * [--order=<order>]
+     * : Urutan pengurutan.
+     * default: DESC
+     * ---
+     *
+     * [--category=<category>]
+     * : Kategori post yang akan diambil.
+     * ---
+     *
+     * [--author=<author>]
+     * : Penulis post yang akan diambil.
+     * ---
+     *
+     * [--include=<include>]
+     * : ID post yang akan diambil.
+     * default: ''
+     * ---
+     *
+     * [--exclude=<exclude>]
+     * : ID post yang akan diabaikan.
+     * default: ''
      * ---
      *
      * ## EXAMPLES
      *
-     *     wp post:list --limit=20 --offset=0
+     *  # Menampilkan 20 post pertama
+     *  $ wp post:list
+     * 
+     *  # Menampilkan 20 post pertama dari offset 20
+     *  $ wp post:list --limit=20 --offset=20
      *
      * @param array $args       Argumen posisional dari perintah CLI.
      * @param array $assoc_args Argumen asosiatif (flag) dari perintah CLI.
@@ -72,20 +101,16 @@ final class List_Post_Command extends Post_Base_Command
             'post__in'         => isset($assoc_args['include']) ? explode(',', $assoc_args['include']) : [],
             'post__not_in'     => isset($assoc_args['exclude']) ? explode(',', $assoc_args['exclude']) : [],
         ];
-        $posts = get_posts($query_args);
 
-        if (!$posts) {
-            WP_CLI::warning('No posts found.');
+        $this->queryArgs = $query_args;
+        $posts = get_posts($this->queryArgs);
+
+        if (!$posts || is_wp_error($posts) || empty($posts)) {
+            $io->renderBlock("No posts found.")->warning();
             return;
         }
 
-
-        $this->process(
-            io: $io,
-            limit: $assoc_args['limit'] ?? 15,
-            offset: $assoc_args['offset'] ?? 0,
-            collection: new Collection(data: $posts),
-        );
+        $this->process(io: $io, collection: new Collection(data: $posts));
     }
 
     /**
@@ -95,16 +120,16 @@ final class List_Post_Command extends Post_Base_Command
      * @param int $offset     Jumlah post yang akan dilewati.
      * @param Collection<WP_Post> $collection Koleksi data post.
      */
-    private function process(CliStyle $io, int $limit, int $offset, Collection $collection)
+    private function process(CliStyle $io, Collection $collection)
     {
 
-        $io = new CliStyle();
-        $io->title('📊 View List User', '%C');
+        $io->title('📊 List Post', '%C');
 
         $io->table(
-            fields: ['ID', 'Title', 'Status'],
-            items: $collection->map(function ($post) {
+            fields: ['No', 'ID', 'Title', 'Status'],
+            items: $collection->map(function ($post, $i) {
                 return [
+                    $i + 1,
                     $post->ID,
                     $post->post_title,
                     $post->post_status,
@@ -112,14 +137,11 @@ final class List_Post_Command extends Post_Base_Command
             })->toArray(),
         );
 
-        $io->hr('-');
-        $io->line(
-            implode(' ', [
-                "   ",
-                "✅",
-                WP_CLI::colorize("%_(7)%n"),
-                $io->textGreen("item di temukan")
-            ])
-        );
+        $io->newLine();
+
+        $io->renderInlinePreset()
+            ->add('Total', (string)$collection->count() . ' Post', '📁')
+            ->add('Page', (string)($this->queryArgs['offset'] ?? 0) . '/1 (Limit: 15)', '📄')
+            ->statistics();
     }
 }

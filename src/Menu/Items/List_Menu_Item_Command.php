@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Vigihdev\WpCliEntityCommand\Menu\Items;
 
+use WP_CLI;
+use WP_CLI\Utils;
+use WP_CLI_Command;
 use Vigihdev\Support\Collection;
 use Vigihdev\WpCliEntityCommand\WP_CLI\Menu_Base_Command;
 use Vigihdev\WpCliModels\Entities\MenuEntity;
-use Vigihdev\WpCliModels\DTOs\Entities\Menu\MenuEntityDto;
-use Vigihdev\WpCliModels\DTOs\Entities\Menu\MenuItemEntityDto;
+use Vigihdev\WpCliModels\DTOs\Entities\Menu\{MenuEntityDto, MenuItemEntityDto};
 use Vigihdev\WpCliModels\Entities\MenuItemEntity;
 use Vigihdev\WpCliModels\UI\CliStyle;
-use WP_CLI;
-use WP_CLI_Command;
 
 final class List_Menu_Item_Command extends Menu_Base_Command
 {
@@ -23,23 +23,29 @@ final class List_Menu_Item_Command extends Menu_Base_Command
     }
 
     /**
-     * Menampilkan daftar item menu.
+     * Menampilkan daftar menu item.
      *
      * ## OPTIONS
      *
-     * [--menu=<menu>]
-     * : Slug menu yang akan ditampilkan.
-     * ---
-     * default: primary
-     * ---
+     * [--filter=<filter>]
+     * : Filter menu item berdasarkan menu name.
+     * 
+     * ## EXAMPLES
      *
-     * @param array $args Positional arguments
-     * @param array $assoc_args Associative arguments (options)
+     *     # Menampilkan semua menu item.
+     *     $ wp menu item list
+     *
+     *     # Menampilkan menu item berdasarkan menu name "primary".
+     *     $ wp menu item list --filter=primary
+     *
+     * @param array $args array index
+     * @param array $assoc_args Array asosiatif (flag) dari perintah CLI.
      */
     public function __invoke(array $args, array $assoc_args): void
     {
 
         $io = new CliStyle();
+        $filter = Utils\get_flag_value($assoc_args, 'filter');
 
         $menus = MenuEntity::lists();
         foreach ($menus as $menu) {

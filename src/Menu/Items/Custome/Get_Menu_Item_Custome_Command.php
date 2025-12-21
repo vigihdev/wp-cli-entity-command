@@ -12,7 +12,6 @@ use Vigihdev\WpCliModels\Validators\MenuItemValidator;
 
 final class Get_Menu_Item_Custome_Command extends Menu_Base_Command
 {
-    private const TYPE = 'custom';
     public function __construct()
     {
         parent::__construct(name: 'menu-item-custome:get');

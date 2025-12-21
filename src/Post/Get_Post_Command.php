@@ -55,16 +55,18 @@ final class Get_Post_Command extends Post_Base_Command
     private function process(CliStyle $io)
     {
         $post = $this->post;
-        $io->log('');
-        $io->line(
+        $io->title(
             sprintf("🔥 %s", $io->textGreen('Post Details'))
         );
 
-        $io->hr('-', 75);
-        $io->listLabel(
-            [(string) $post->getId(), $post->getTitle(), $post->getStatus(), $post->getType()],
-            ['ID', 'Title', 'Status', 'Type']
+        $io->table(
+            [
+                ['ID', $post->getId()],
+                ['Title', $post->getTitle()],
+                ['Status', $post->getStatus()],
+                ['Type', $post->getType()],
+            ],
+            ['Label', 'Value']
         );
-        $io->hr('-', 75);
     }
 }

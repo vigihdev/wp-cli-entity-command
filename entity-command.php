@@ -60,7 +60,11 @@ $configs = [
         'media:update' => 'Update_Media_Command',
     ],
     'Vigihdev\WpCliEntityCommand\User' => [
-        'user:list' => 'List_User_Command'
+        'user:list' => 'List_User_Command',
+        'user:get' => 'Get_User_Command',
+        'user:export' => 'Export_User_Command',
+        'user:update' => 'Update_User_Command',
+        'user:delete' => 'Delete_User_Command',
     ],
 ];
 
