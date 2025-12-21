@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Vigihdev\WpCliEntityCommand\Term;
 
+use Vigihdev\Support\Collection;
 use WP_CLI;
-use WP_CLI_Command;
+use WP_CLI\Utils;
 use Vigihdev\WpCliEntityCommand\WP_CLI\Term_Base_Command;
 use Vigihdev\WpCliModels\UI\CliStyle;
 
@@ -17,97 +18,73 @@ final class List_Term_Command extends Term_Base_Command
     }
 
     /**
-     * List terms in any taxonomy
+     * List terms
      *
-     * ## OPTIONS
-     *
-     * --taxonomy=<taxonomy>
-     * : Taxonomy name (required)
-     * 
-     * [--format=<format>]
-     * : Output format
+     * [--limit=<limit>]
+     * : Batas jumlah term yang ditampilkan
      * ---
-     * default: table
+     * default: 20
      * ---
      * 
-     * [--hide-empty]
-     * : Hide empty terms
+     * [--offset=<offset>]
+     * : Offset term yang ditampilkan
+     * ---
+     * default: 0
+     * ---
      * 
-     * [--parent=<parent>]
-     * : Parent term ID
+     * [--filter=<filter>]
+     * : Filter term berdasarkan nama, slug, atau ID
      * 
      * ## EXAMPLES
-     * 
-     *     # List categories
-     *     $ wp term:list --taxonomy=category
-     * 
-     *     # List tags
-     *     $ wp term:list --taxonomy=post_tag
-     * 
-     *     # List custom taxonomy terms
-     *     $ wp term:list --taxonomy=kota_category
+     *  
+     *     # List terms in all taxonomies limit 20
+     *     $ wp term:list
+     *     
+     *     # List terms limit 10
+     *     $ wp term:list --limit=10
      * 
      * @param array $args
      * @param array $assoc_args
      */
     public function __invoke(array $args, array $assoc_args): void
     {
+
         $io = new CliStyle();
-        // REQUIRED: taxonomy parameter
-        if (!isset($assoc_args['taxonomy'])) {
-            WP_CLI::error('Missing required parameter: --taxonomy');
+        $this->limit = (int) Utils\get_flag_value($assoc_args, 'limit', self::DEFAULT_LIMIT);
+        $this->offset = (int) Utils\get_flag_value($assoc_args, 'offset', 0);
+        $this->filter = Utils\get_flag_value($assoc_args, 'filter');
+
+        if ($this->limit > self::DEFAULT_LIMIT) {
+            $io->renderBlock(sprintf('Limit cannot be greater than %d.', self::DEFAULT_LIMIT))->warning();
+            return;
         }
-
-        $taxonomy = $assoc_args['taxonomy'];
-
-        // Validate taxonomy exists
-        if (!taxonomy_exists($taxonomy)) {
-            WP_CLI::error("Taxonomy '{$taxonomy}' does not exist");
-        }
-
-        $term_args = [
-            'taxonomy'   => $taxonomy,
-            'hide_empty' => isset($assoc_args['hide-empty']),
-            'parent'     => $assoc_args['parent'] ?? 0,
-        ];
-
-        $terms = get_terms($term_args);
-
-        if (is_wp_error($terms)) {
-            WP_CLI::error($terms->get_error_message());
-        }
-
-        if (empty($terms)) {
-            WP_CLI::warning('No terms found.');
+        $terms = $this->getTermsCollection()
+            ->slice($this->offset, $this->limit);
+        if ($terms->isEmpty()) {
+            $io->renderBlock('No terms found.')->info();
             return;
         }
 
-        $table_data = [];
-        foreach ($terms as $term) {
-            $table_data[] = [
-                'ID'     => $term->term_id,
-                'Name'   => $term->name,
-                'Slug'   => $term->slug,
-                'Count'  => $term->count,
-                'Parent' => $term->parent ?: '—',
-            ];
-        }
-
-        WP_CLI\Utils\format_items(
-            $assoc_args['format'] ?? 'table',
-            $table_data,
-            ['ID', 'Name', 'Slug', 'Count', 'Parent']
-        );
-
-        WP_CLI::success(sprintf(
-            'Found %d term(s) in taxonomy: %s',
-            count($terms),
-            $taxonomy
-        ));
+        $this->process($io, $terms);
     }
 
-    public function process(CliStyle $io): void
+    public function process(CliStyle $io, Collection $terms): void
     {
         $io->title("📊 List Terms", '%C');
+
+        $items = [];
+        foreach ($terms->values() as $index => $term) {
+            $items[] = [
+                $index + 1,
+                $term->getTermId(),
+                $term->getName(),
+                $term->getSlug(),
+                $term->getCount(),
+                $term->getParent() ?: '—',
+            ];
+        }
+        $io->table($items, ['No', 'ID', 'Name', 'Slug', 'Count', 'Parent']);
+
+        $io->renderPaginationPreset('Terms', $this->limit, $this->getTermsCollection()->count())->render();
     }
 }

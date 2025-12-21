@@ -34,6 +34,10 @@ final class List_Post_Command extends Post_Base_Command
      * : Jumlah post yang akan dilewati.
      * default: 0
      * ---
+     * [--fields=<fields>]
+     * : Field yang akan ditampilkan.
+     * default: id,title,type,status
+     * ---
      *
      * [--post-type=<type>]
      * : Tipe post yang akan diambil.
@@ -61,16 +65,6 @@ final class List_Post_Command extends Post_Base_Command
      *
      * [--author=<author>]
      * : Penulis post yang akan diambil.
-     * ---
-     *
-     * [--include=<include>]
-     * : ID post yang akan diambil.
-     * default: ''
-     * ---
-     *
-     * [--exclude=<exclude>]
-     * : ID post yang akan diabaikan.
-     * default: ''
      * ---
      *
      * ## EXAMPLES
